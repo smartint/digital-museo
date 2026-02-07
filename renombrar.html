@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Renombrador de archivos (carpeta local)</title>
+  <style>
+    :root{
+      --bg:#f6f8fc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line: rgba(148,163,184,.35);
+      --shadow: 0 14px 34px rgba(15,23,42,.10);
+      --radius: 18px;
+      --btn:#0ea5e9;
+      --btn2:#10b981;
+      --danger:#ef4444;
+      --warn:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, #e9f6ff 0%, transparent 60%),
+        radial-gradient(900px 700px at 85% 15%, #efe9ff 0%, transparent 55%),
+        var(--bg);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:22px 16px 40px}
+    .top{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
+      flex-wrap:wrap; margin-bottom:14px;
+    }
+    h1{margin:0;font-size:clamp(20px,3vw,28px);letter-spacing:-.02em}
+    .sub{margin:6px 0 0;color:var(--muted);font-size:13px;max-width:70ch}
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid var(--line);
+      padding:14px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 920px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{
+      appearance:none;border:0;border-radius:14px;
+      padding:10px 14px;font-weight:800;color:#fff;cursor:pointer;
+      background:var(--btn);
+      box-shadow:0 10px 22px rgba(2,132,199,.22);
+      transition:transform .15s ease, opacity .15s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .btn.secondary{background:#334155;box-shadow:0 10px 22px rgba(15,23,42,.18)}
+    .btn.good{background:var(--btn2);box-shadow:0 10px 22px rgba(16,185,129,.18)}
+    .btn.danger{background:var(--danger);box-shadow:0 10px 22px rgba(239,68,68,.16)}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:999px;
+      border:1px solid var(--line); background:#fff;
+      font-size:12.5px;color:var(--muted);
+    }
+    .opts{
+      display:grid; gap:10px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 520px){
+      .opts{grid-template-columns: 1fr}
+    }
+    label{
+      display:flex;align-items:center;gap:8px;
+      padding:10px 10px;border:1px solid var(--line);
+      border-radius:14px;background:#fff;
+      font-size:13px;color:var(--text);
+    }
+    input[type="checkbox"]{width:18px;height:18px}
+    .small{font-size:12px;color:var(--muted)}
+    .tableWrap{overflow:auto;border-radius:14px;border:1px solid var(--line)}
+    table{width:100%;border-collapse:separate;border-spacing:0;background:#fff}
+    thead th{
+      position:sticky;top:0;background:#f8fafc;
+      border-bottom:1px solid var(--line);
+      text-align:left;font-size:12px;color:var(--muted);
+      padding:10px 10px;
+      z-index:1;
+    }
+    tbody td{
+      border-bottom:1px solid rgba(148,163,184,.22);
+      padding:10px 10px;font-size:13px;vertical-align:top;
+    }
+    tbody tr:last-child td{border-bottom:0}
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12.5px;
+    }
+    .status{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+      white-space:pre-wrap;
+    }
+    .warn{color:#92400e}
+    .ok{color:#065f46}
+    .bad{color:#7f1d1d}
+    .count{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+      margin-top:10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Renombrador de archivos (carpeta local)</h1>
+        <p class="sub">
+          Selecciona una carpeta y la app propondrá nuevos nombres:
+          espacios → guiones, mayúsculas → minúsculas, opcionalmente elimina tildes y convierte ñ→n.
+          <br><span class="small">Nota: por limitaciones del navegador, “renombrar” se hace creando un archivo nuevo y borrando el antiguo.</span>
+        </p>
+      </div>
+      <div class="row">
+        <span class="pill" id="folderPill">📁 Ninguna carpeta seleccionada</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="row">
+          <button class="btn" id="pickBtn">Seleccionar carpeta</button>
+          <button class="btn secondary" id="scanBtn" disabled>Escanear</button>
+          <button class="btn good" id="renameBtn" disabled>Renombrar</button>
+          <button class="btn danger" id="clearBtn">Limpiar</button>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="opts">
+          <label><input type="checkbox" id="onlyHtml" checked> Solo archivos .html</label>
+          <label><input type="checkbox" id="skipIndex" checked> No tocar index.html</label>
+
+          <label><input type="checkbox" id="spacesToHyphens" checked> Sustituir espacios por “-”</label>
+          <label><input type="checkbox" id="lowercase" checked> Convertir a minúsculas</label>
+
+          <label><input type="checkbox" id="removeAccents" checked> Eliminar tildes/diacríticos (á→a, ü→u…)</label>
+          <label><input type="checkbox" id="enyeToN" checked> Convertir ñ→n</label>
+
+          <label><input type="checkbox" id="trimHyphens" checked> Normalizar guiones (--- → -)</label>
+          <label><input type="checkbox" id="simulate" checked> Simulación (no cambia nada)</label>
+        </div>
+
+        <div class="count" id="counts"></div>
+
+        <div class="status" id="log">💡 Consejo: abre este archivo en Chrome/Edge. Si “Seleccionar carpeta” no aparece, sirve el archivo desde localhost (por ejemplo con un servidor local).</div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <strong>Vista previa</strong>
+          <span class="pill">🧾 Actual → Nuevo</span>
+        </div>
+        <div style="height:10px"></div>
+
+        <div class="tableWrap" style="max-height:520px">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:48px">#</th>
+                <th>Nombre actual</th>
+                <th>Nombre nuevo</th>
+                <th style="width:120px">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              <tr><td colspan="4" style="color:var(--muted)">Selecciona una carpeta y pulsa “Escanear”.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="small" style="margin:10px 2px 0">
+          Si ya existe el nombre nuevo, se añadirá <code>-1</code>, <code>-2</code>, etc.
+        </p>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // --- UI refs
+  const pickBtn   = document.getElementById('pickBtn');
+  const scanBtn   = document.getElementById('scanBtn');
+  const renameBtn = document.getElementById('renameBtn');
+  const clearBtn  = document.getElementById('clearBtn');
+
+  const folderPill = document.getElementById('folderPill');
+  const tbody = document.getElementById('tbody');
+  const logEl = document.getElementById('log');
+  const countsEl = document.getElementById('counts');
+
+  // Options
+  const opt = id => document.getElementById(id);
+
+  let dirHandle = null;
+  let plan = []; // [{i, oldName, newName, status, kind}]
+
+  function log(msg, tone='') {
+    logEl.className = 'status ' + (tone || '');
+    logEl.textContent = msg;
+  }
+
+  function setCounts({total=0, changes=0, skipped=0, conflicts=0} = {}) {
+    countsEl.innerHTML = `
+      <span class="pill">Total: <strong>${total}</strong></span>
+      <span class="pill">Cambian: <strong>${changes}</strong></span>
+      <span class="pill">Saltados: <strong>${skipped}</strong></span>
+      <span class="pill">Conflictos resueltos: <strong>${conflicts}</strong></span>
+    `;
+  }
+
+  function supportsFSAccess() {
+    return ('showDirectoryPicker' in window);
+  }
+
+  function splitName(name) {
+    const idx = name.lastIndexOf('.');
+    if (idx <= 0) return { base: name, ext: '' };
+    return { base: name.slice(0, idx), ext: name.slice(idx) };
+  }
+
+  function removeDiacritics(str) {
+    // NFD descompone letras con acento en letra + marca; luego quitamos marcas
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function makeSlug(originalName) {
+    const { base, ext } = splitName(originalName);
+
+    let s = base;
+
+    if (opt('lowercase').checked) s = s.toLowerCase();
+
+    // ñ->n (si se aplica antes de quitar diacríticos, también se soluciona; lo dejamos explícito)
+    if (opt('enyeToN').checked) {
+      s = s.replace(/ñ/g, 'n').replace(/Ñ/g, 'n');
+    }
+
+    if (opt('removeAccents').checked) {
+      // esto también convierte ñ -> n si no lo hiciste antes (porque ñ = n + tilde), pero mantenemos el checkbox
+      s = removeDiacritics(s);
+    }
+
+    if (opt('spacesToHyphens').checked) {
+      s = s.replace(/[\s_]+/g, '-'); // espacios y guiones bajos -> -
+    }
+
+    // Eliminar caracteres raros (dejamos letras/números, guion y algunos signos)
+    s = s.replace(/[^a-z0-9\-.,()]+/gi, '-');
+
+    if (opt('trimHyphens').checked) {
+      s = s.replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    return s + ext.toLowerCase(); // extensión a minúscula
+  }
+
+  async function pickFolder() {
+    if (!supportsFSAccess()) {
+      log('❌ Tu navegador no soporta la selección de carpetas (File System Access API). Usa Chrome o Edge.', 'bad');
+      return;
+    }
+    try{
+      dirHandle = await window.showDirectoryPicker();
+      folderPill.textContent = `📁 Carpeta seleccionada`;
+      scanBtn.disabled = false;
+      log('✅ Carpeta seleccionada. Pulsa “Escanear” para generar la vista previa.', 'ok');
+    } catch(e){
+      log('ℹ️ Selección de carpeta cancelada.', '');
+    }
+  }
+
+  function renderPlan(rows) {
+    tbody.innerHTML = '';
+    if (!rows.length) {
+      tbody.innerHTML = `<tr><td colspan="4" style="color:var(--muted)">No se encontraron archivos (según los filtros).</td></tr>`;
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    for (const r of rows) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><code>${r.i}</code></td>
+        <td><code>${escapeHtml(r.oldName)}</code></td>
+        <td><code>${escapeHtml(r.newName)}</code></td>
+        <td>${statusChip(r.status)}</td>
+      `;
+      frag.appendChild(tr);
+    }
+    tbody.appendChild(frag);
+  }
+
+  function statusChip(status) {
+    const map = {
+      same:   `<span class="pill">sin cambio</span>`,
+      skip:   `<span class="pill warn">saltado</span>`,
+      change: `<span class="pill ok">cambiar</span>`,
+      conflict:`<span class="pill warn">conflicto</span>`,
+      done:   `<span class="pill ok">hecho</span>`,
+      error:  `<span class="pill bad">error</span>`
+    };
+    return map[status] || `<span class="pill">${escapeHtml(status)}</span>`;
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  async function scanFolder() {
+    if (!dirHandle) return;
+
+    plan = [];
+    let i = 0;
+
+    const onlyHtml = opt('onlyHtml').checked;
+    const skipIndex = opt('skipIndex').checked;
+
+    // Para detectar colisiones dentro de la carpeta
+    const existing = new Set();
+    for await (const [name, handle] of dirHandle.entries()) {
+      if (handle.kind === 'file') existing.add(name);
+    }
+
+    let total = 0, changes = 0, skipped = 0, conflicts = 0;
+
+    for await (const [name, handle] of dirHandle.entries()) {
+      if (handle.kind !== 'file') continue;
+
+      total++;
+      const lowerName = name.toLowerCase();
+
+      if (skipIndex && lowerName === 'index.html') {
+        skipped++;
+        continue;
+      }
+
+      if (onlyHtml && !lowerName.endsWith('.html')) {
+        skipped++;
+        continue;
+      }
+
+      const proposed = makeSlug(name);
+
+      // Si no cambia, lo marcamos
+      if (proposed === name) {
+        plan.push({ i: ++i, oldName: name, newName: proposed, status: 'same', handle });
+        continue;
+      }
+
+      // Resolver colisión: si ya existe el nuevo nombre, añadimos sufijos
+      let finalName = proposed;
+      if (existing.has(finalName)) {
+        const { base, ext } = splitName(proposed);
+        let n = 1;
+        while (existing.has(`${base}-${n}${ext}`)) n++;
+        finalName = `${base}-${n}${ext}`;
+        conflicts++;
+      }
+
+      existing.add(finalName);
+
+      plan.push({ i: ++i, oldName: name, newName: finalName, status: 'change', handle });
+      changes++;
+    }
+
+    renderPlan(plan);
+    setCounts({ total, changes, skipped, conflicts });
+
+    renameBtn.disabled = !plan.some(x => x.status === 'change');
+    log(`🧾 Vista previa lista. ${changes} archivo(s) se renombrarán${opt('simulate').checked ? ' (SIMULACIÓN activada)' : ''}.`, changes ? 'ok' : '');
+  }
+
+  async function ensureWritePermission(handle) {
+    // Solicita permiso de escritura si hace falta
+    const opts = { mode: 'readwrite' };
+    if ((await handle.queryPermission(opts)) === 'granted') return true;
+    if ((await handle.requestPermission(opts)) === 'granted') return true;
+    return false;
+  }
+
+  async function safeRename(oldName, newName, fileHandle) {
+    // “Renombrar” en FS Access API: crear nuevo archivo y borrar el antiguo
+    const file = await fileHandle.getFile();
+    const buf = await file.arrayBuffer();
+
+    const newHandle = await dirHandle.getFileHandle(newName, { create: true });
+    const writable = await newHandle.createWritable();
+    await writable.write(buf);
+    await writable.close();
+
+    await dirHandle.removeEntry(oldName);
+  }
+
+  async function runRename() {
+    if (!dirHandle || !plan.length) return;
+
+    const simulate = opt('simulate').checked;
+
+    // Permiso de escritura sobre el directorio
+    const ok = await ensureWritePermission(dirHandle);
+    if (!ok) {
+      log('❌ No se concedió permiso de escritura para la carpeta.', 'bad');
+      return;
+    }
+
+    let done = 0, errors = 0;
+    renameBtn.disabled = true;
+    scanBtn.disabled = true;
+    pickBtn.disabled = true;
+
+    try{
+      for (let idx=0; idx<plan.length; idx++){
+        const item = plan[idx];
+        if (item.status !== 'change') continue;
+
+        try{
+          if (!simulate) {
+            await safeRename(item.oldName, item.newName, item.handle);
+          }
+          item.status = 'done';
+          done++;
+        }catch(e){
+          console.error(e);
+          item.status = 'error';
+          errors++;
+        }
+        renderPlan(plan);
+      }
+
+      if (simulate) {
+        log(`✅ Simulación terminada. Archivos que cambiarían: ${done}. (No se modificó nada)`, 'ok');
+      } else {
+        log(`✅ Proceso terminado. Renombrados: ${done}. Errores: ${errors}. Pulsa “Escanear” para verificar.`, errors ? 'warn' : 'ok');
+      }
+    } finally {
+      scanBtn.disabled = false;
+      pickBtn.disabled = false;
+      renameBtn.disabled = false;
+    }
+  }
+
+  function clearAll() {
+    plan = [];
+    tbody.innerHTML = `<tr><td colspan="4" style="color:var(--muted)">Selecciona una carpeta y pulsa “Escanear”.</td></tr>`;
+    setCounts({total:0, changes:0, skipped:0, conflicts:0});
+    log('🧹 Limpio. Selecciona carpeta y escanea.', '');
+  }
+
+  // Events
+  pickBtn.addEventListener('click', pickFolder);
+  scanBtn.addEventListener('click', scanFolder);
+  renameBtn.addEventListener('click', runRename);
+  clearBtn.addEventListener('click', clearAll);
+
+  // Re-scan when options change (if already have folder)
+  for (const id of ['onlyHtml','skipIndex','spacesToHyphens','lowercase','removeAccents','enyeToN','trimHyphens','simulate']) {
+    opt(id).addEventListener('change', () => { if (dirHandle) scanFolder(); });
+  }
+
+  // Initial note
+  if (!supportsFSAccess()) {
+    log('⚠️ Este navegador no soporta selección de carpetas. Usa Chrome/Edge para que funcione.', 'warn');
+  }
+})();
+</script>
+</body>
+</html>

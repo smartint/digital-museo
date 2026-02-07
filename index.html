@@ -1,0 +1,275 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Una noche en el museo</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --txt:#111827;
+      --muted:#6b7280;
+      --line:rgba(17,24,39,.12);
+      --shadow: 0 12px 30px rgba(17,24,39,.10);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(59,130,246,.10) 0%, rgba(59,130,246,0) 55%),
+        radial-gradient(1000px 700px at 85% 10%, rgba(168,85,247,.10) 0%, rgba(168,85,247,0) 55%),
+        var(--bg);
+      color:var(--txt);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 18px 46px}
+    header{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+      padding:18px 18px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.55));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    h1{margin:0;font-size: clamp(22px, 2.4vw, 34px);letter-spacing:.2px;text-transform:lowercase}
+    .hint{margin:0;color:var(--muted);font-size:14px}
+
+    /* galería fija: 4 por fila SIEMPRE */
+    .gallery{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:16px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      transform: translateZ(0);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      min-width:0;
+    }
+    .card:hover{
+      transform: translateY(-3px) scale(1.01);
+      border-color: rgba(59,130,246,.35);
+      box-shadow: 0 16px 38px rgba(17,24,39,.14);
+    }
+    .thumb{position:relative;width:100%;aspect-ratio:16/9;background: rgba(17,24,39,.04);overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .meta{padding:12px 12px 14px}
+    .title{margin:0;font-size:14px;line-height:1.2;color:var(--txt);text-transform:lowercase}
+    a{color:inherit;text-decoration:none}
+    .badge{
+      display:inline-block;margin-top:8px;padding:4px 8px;border-radius:999px;font-size:12px;
+      color:var(--muted);border:1px solid rgba(17,24,39,.12);background: rgba(17,24,39,.03);
+      word-break:break-word;
+    }
+
+    /* si la pantalla es estrecha, mantener 4 por fila con scroll horizontal */
+    @media (max-width: 520px){
+      .wrap{padding:18px 12px 34px}
+      .gallery{overflow-x:auto;padding-bottom:8px}
+      .card{min-width:220px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Una noche en el museo</h1>
+        <p></p>
+      </div>
+      <p class="hint">archivo: <strong>index.html</strong></p>
+    </header>
+
+    <section class="gallery" aria-label="galería">
+<article class="card">
+        <a href="una-noche-en-el-museo-prologo.html">
+          <div class="thumb"><img src="prologo.jpg" alt="cuando las luces se apagancuando las luces se apagan el reloj marcaba las nueve de la noche. la última familia salía del museo mientras el eco de sus pasos resonaba en los altos techos del vestíbulo. sofía y leo, dos jóvenes voluntarios del museo de historia y arte de la ciudad, observaban desde las sombras cómo las puertas principales se cerraban con un pesado estruendo. desde ese momento, el museo era suyo."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">Una-noche-en-el-museo-prologo.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="01-el-guardian-de-las-momias.html">
+          <div class="thumb"><img src="01-el-guardian-de-las-momias.jpg" alt="el guardián de las momiasel guardián de las momias el guardián de las momias.  sofía y leo quedan atrapados en la sala egipcia cuando la figura de un antiguo sacerdote momificado parece cobrar vida. descubren que está buscando un amuleto perdido que podría liberar su alma."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">01-el-guardian-de-las-momias.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="02-la-estatua-que-cobra-vida.html">
+          <div class="thumb"><img src="02-la-estatua-que-cobra-vida.jpg" alt="la estatua que cobra vidala estatua que cobra vida la estatua que cobra vida. una estatua griega se mueve por la sala. los jóvenes siguen las huellas de mármol hasta darse cuenta de que la estatua está intentando evitar que un objeto mágico caiga en manos equivocadas."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">02-la-estatua-que-cobra-vida.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="03-el-pergamino-maldito.html">
+          <div class="thumb"><img src="03-el-pergamino-maldito.jpg" alt="el pergamino malditoel pergamino maldito el pergamino maldito. un pergamino chino empieza a emitir una tenue luz roja. sofía y leo lo leen por accidente y deben descifrarlo antes de que los atrape el &quot;espíritu del dragón&quot; que protege el texto."></div>
+          <div class="meta">
+
+            <span class="badge">03-el-pergamino-maldito.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="04-la-habitacion-que-desaparecio.html">
+          <div class="thumb"><img src="04-la-habitacion-que-desaparecio.jpg" alt="la habitación que desaparecila habitación que desapareció la habitación que desapareció.   una sala llena de reliquias medievales parece desaparecer cada vez que entran en ella. al explorar, los jóvenes descubren que se trata de un bucle temporal generado por un reloj mágico.ó"></div>
+          <div class="meta">
+
+            <span class="badge">04-la-habitacion-que-desaparecio.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="05-un-cuadro-con-un-mensaje-secreto.html">
+          <div class="thumb"><img src="05-un-cuadro-con-un-mensaje-secreto.jpg" alt="un cuadro con un mensaje secretoun cuadro con un mensaje secreto un cuadro con un mensaje secreto.  un cuadro renacentista revela palabras invisibles bajo la luz de la luna. los jóvenes siguen las pistas para desenterrar una caja escondida en los cimientos del museo."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">05-un-cuadro-con-un-mensaje-secreto.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="06-el-fosil-que-no-deberia-existir.html">
+          <div class="thumb"><img src="06-el-fosil-que-no-deberia-existir.jpg" alt="el fósil que no debería existirel fósil que no debería existir el fósil que no debería existir. en la galería de paleontología, un fósil de dinosaurio comienza a emitir sonidos extraños. leo y sofía descubren que pertenece a una especie desconocida que el museo no quiere revelar."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">06-el-fosil-que-no-deberia-existir.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="07-la-maldicion-de-la-mascara.html">
+          <div class="thumb"><img src="07-la-maldicion-de-la-mascara.jpg" alt="la maldición de la máscarala maldición de la máscara la maldición de la máscara.  una máscara tribal africana parece observar a los visitantes. al investigar, sofía y leo desatan una serie de eventos sobrenaturales y deben aprender el ritual correcto para detenerlo."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">07-la-maldicion-de-la-mascara.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="10-el-barco-dentro-de-la-botella.html">
+          <div class="thumb"><img src="10-el-barco-dentro-de-la-botella.jpg" alt="el barco dentro de la botellael barco dentro de la botella el barco dentro de la botella.  una pequeña maqueta de un barco comienza a emitir sonidos de un océano embravecido. sofía y leo descubren que el barco contiene el alma del capitán, buscando justicia."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">10-el-barco-dentro-de-la-botella.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="11-el-fantasma-del-bibliotecario.html">
+          <div class="thumb"><img src="11-el-fantasma-del-bibliotecario.jpg" alt="el fantasma del bibliotecarioel fantasma del bibliotecario el fantasma del bibliotecario.  en los archivos del museo, se aparecen sombras de un antiguo bibliotecario que oculta un manuscrito prohibido. los jóvenes enfrentan pruebas para recuperar el texto."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">11-el-fantasma-del-bibliotecario.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="12-la-espada-del-rey-desaparecido.html">
+          <div class="thumb"><img src="12-la-espada-del-rey-desaparecido.jpg" alt="la espada del rey desaparecidola espada del rey desaparecido la espada del rey desaparecido. una espada medieval comienza a brillar y parece guiarlos hacia un pasadizo oculto, donde encuentran secretos de un rey olvidado."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">12-la-espada-del-rey-desaparecido.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="13-las-luces-de-la-aurora.html">
+          <div class="thumb"><img src="13-las-luces-de-la-aurora.jpg" alt="las luces de la auroralas luces de la aurora las luces de la aurora. un meteorito en la exposición de astronomía emite un resplandor similar a la aurora boreal. cuando los tocan, son transportados a un mundo de hielo que deben abandonar antes del amanecer."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">13-las-luces-de-la-aurora.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="14-la-coleccion-maldita.html">
+          <div class="thumb"><img src="14-la-coleccion-maldita.jpg" alt="la colección malditala colección maldita la colección maldita.  una serie de figuras de cera parecen moverse cada vez que los jóvenes no miran. los protagonistas descubren que están recreando una historia trágica que deben desentrañar."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">14-la-coleccion-maldita.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="15-el-manuscrito-de-leonardo.html">
+          <div class="thumb"><img src="15-el-manuscrito-de-leonardo.jpg" alt="el manuscrito de leonardoel manuscrito de leonardo el manuscrito de leonardo.  un códice atribuido a da vinci revela un mecanismo oculto que abre un pequeño portal hacia su laboratorio. sofía y leo deben descifrarlo antes de que el portal se cierre."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">15-el-manuscrito-de-leonardo.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="16-el-eco-de-la-opera.html">
+          <div class="thumb"><img src="16-el-eco-de-la-opera.jpg" alt="el eco de la óperael eco de la ópera el eco de la ópera. un antiguo piano de cola comienza a tocar por sí solo una ópera olvidada. los jóvenes descubren que una partitura incompleta guarda un secreto sobre el compositor."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">16-el-eco-de-la-opera.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="17-los-guardianes-de-la-piedra.html">
+          <div class="thumb"><img src="17-los-guardianes-de-la-piedra.jpg" alt="los guardianes de la piedralos guardianes de la piedra los guardianes de la piedra.  una gema gigante en la sala de minerales emite destellos que hipnotizan a quienes la miran. sofía y leo deben protegerla de una figura misteriosa que intenta robársela."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">17-los-guardianes-de-la-piedra.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="18-la-ultima-pagina-del-libro.html">
+          <div class="thumb"><img src="18-la-ultima-pagina-del-libro.jpg" alt="la última página del librola última página del libro la última página del libro. un libro de cuentos en la exposición de literatura parece reescribir su final cada noche. al leerlo, los jóvenes son transportados a sus historias y deben encontrar la salida."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">18-la-ultima-pagina-del-libro.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="19-el-holograma-traidor.html">
+          <div class="thumb"><img src="19-el-holograma-traidor.jpg" alt="el holograma traidorel holograma traidor el holograma traidor.  una nueva exposición interactiva basada en hologramas se descontrola, y los personajes creados empiezan a rebelarse. sofía y leo deben apagar el sistema antes de quedar atrapados."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">19-el-holograma-traidor.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="20-el-ultimo-misterio.html">
+          <div class="thumb"><img src="20-el-ultimo-misterio.jpg" alt="el último misterioel último misterio el último misterio.  en el relato final, los jóvenes descubren una carta que conecta todos los eventos anteriores. al resolverla, desatan un misterio mayor que involucra al propio museo y sus orígenes sobrenaturales."></div>
+          <div class="meta">
+            <p class="title"></p>
+            <span class="badge">20-el-ultimo-misterio.html</span>
+          </div>
+        </a>
+      </article>
+<article class="card">
+        <a href="epilogo-los-secretos-del-museo.html">
+          <div class="thumb"><img src="epilogo.jpg" alt="epílogo"></div>
+          <div class="meta">
+            <span class="badge">epilogo-los-secretos-del-museo.html</span>
+          </div>
+        </a>
+      </article>
+    </section>
+  </div>
+</body>
+</html>

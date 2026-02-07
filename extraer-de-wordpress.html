@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>generador index.html desde wordpress</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --card:#ffffff;
+      --txt:#111827;
+      --muted:#6b7280;
+      --line:rgba(17,24,39,.12);
+      --shadow: 0 12px 30px rgba(17,24,39,.10);
+      --radius:16px;
+      --accent:#2563eb;
+      --bad:#b91c1c;
+      --ok:#047857;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(59,130,246,.10) 0%, rgba(59,130,246,0) 55%),
+        radial-gradient(1000px 700px at 85% 10%, rgba(168,85,247,.10) 0%, rgba(168,85,247,0) 55%),
+        var(--bg);
+      color:var(--txt);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:22px 14px 46px}
+    header{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+      padding:16px 16px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.55));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    h1{margin:0;font-size: clamp(18px, 2.3vw, 28px);letter-spacing:.2px;text-transform:lowercase}
+    .hint{margin:0;color:var(--muted);font-size:13px}
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+    .panel h2{margin:0 0 10px 0;font-size:15px;text-transform:lowercase}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input[type="text"], textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 10px;
+      font-size:13px;
+      outline:none;
+      background:#fff;
+      color:var(--txt);
+    }
+    textarea{min-height:140px;resize:vertical}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{
+      appearance:none;border:1px solid rgba(17,24,39,.14);
+      background: linear-gradient(180deg, #ffffff, #f3f4f6);
+      color:var(--txt);
+      padding:10px 12px;border-radius:12px;
+      font-size:13px;cursor:pointer;
+      box-shadow: 0 8px 18px rgba(17,24,39,.08);
+      transition: transform .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(37,99,235,.35);}
+    .btn.primary{
+      border-color: rgba(37,99,235,.35);
+      background: linear-gradient(180deg, rgba(37,99,235,.14), rgba(37,99,235,.07));
+    }
+    .btn.danger{
+      border-color: rgba(185,28,28,.25);
+      background: linear-gradient(180deg, rgba(185,28,28,.10), rgba(185,28,28,.05));
+    }
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{
+      border:1px solid rgba(17,24,39,.12);
+      background: rgba(17,24,39,.03);
+      padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted)
+    }
+    .chip.ok{border-color: rgba(4,120,87,.25); background: rgba(4,120,87,.07); color: var(--ok);}
+    .chip.bad{border-color: rgba(185,28,28,.25); background: rgba(185,28,28,.06); color: var(--bad);}
+    .log{
+      margin-top:10px;
+      border:1px dashed rgba(17,24,39,.18);
+      background: rgba(17,24,39,.02);
+      border-radius: 12px;
+      padding:10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size:12px;
+      white-space:pre-wrap;
+      max-height: 240px;
+      overflow:auto;
+    }
+
+    /* ======== vista previa salida (modo claro) ======== */
+    .out-header{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+      padding:14px 14px 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.82));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .out-header h3{margin:0;font-size:16px;text-transform:lowercase}
+    .out-sub{margin:0;color:var(--muted);font-size:13px}
+    .preview{
+      margin-top:12px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .preview-inner{padding:14px}
+
+    /* galería fija 4 por fila */
+    .gallery{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:14px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92));
+      border:1px solid var(--line);
+      border-radius: 16px;
+      overflow:hidden;
+      box-shadow: 0 12px 28px rgba(17,24,39,.10);
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+      min-width:0;
+    }
+    .card:hover{
+      transform: translateY(-3px) scale(1.01);
+      border-color: rgba(37,99,235,.30);
+      box-shadow: 0 16px 36px rgba(17,24,39,.14);
+    }
+    .thumb{width:100%; aspect-ratio:16/9; background: rgba(17,24,39,.04); overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .meta{padding:10px 10px 12px}
+    .title{margin:0;font-size:13px;line-height:1.25;text-transform:lowercase}
+    .badge{
+      display:inline-block;margin-top:7px;
+      padding:4px 8px;border-radius:999px;font-size:12px;
+      color:var(--muted);border:1px solid rgba(17,24,39,.12);
+      background: rgba(17,24,39,.03);
+      word-break:break-word;
+    }
+
+    /* mantener 4 por fila con scroll en pantallas muy estrechas */
+    @media (max-width: 520px){
+      .gallery{overflow-x:auto;padding-bottom:8px}
+      .card{min-width:220px}
+    }
+
+    .small{font-size:12px;color:var(--muted)}
+    .klist{margin:8px 0 0 0; padding-left:18px; color:var(--muted); font-size:12px}
+    a{color:inherit}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>generador index.html desde wordpress</h1>
+        <p class="hint">
+          pide una url, extrae el contenido (sin cabecera/menú/widgets/pie), reescribe enlaces e imágenes y genera un <strong>index.html</strong>.
+        </p>
+      </div>
+      <p class="hint">modo claro · galería 4 por fila · nombres en minúsculas</p>
+    </header>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>1) origen</h2>
+
+        <label for="url">url de la página wordpress</label>
+        <input id="url" type="text" placeholder="https://..." value="" />
+
+        <label for="proxy">opcional: prefijo proxy cors (si el fetch directo falla)</label>
+        <input id="proxy" type="text" placeholder="(vacío) o p. ej. https://r.jina.ai/http(s)://"
+               value="" />
+        <p class="small" style="margin:6px 0 0 0">
+          si la web bloquea cors, el navegador no podrá descargar el html directamente. en ese caso:
+          (a) usa un proxy cors que tú controles, o (b) pega el html abajo.
+        </p>
+
+        <label for="htmlpaste">alternativa: pegar html fuente (si no se puede cargar por url)</label>
+        <textarea id="htmlpaste" placeholder="pega aquí el html completo (por ejemplo, desde ver código fuente)"></textarea>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn primary" id="btnLoad">cargar y analizar</button>
+          <button class="btn" id="btnGenerate" disabled>generar vista previa</button>
+          <button class="btn primary" id="btnDownload" disabled>descargar index.html</button>
+          <button class="btn danger" id="btnReset">reiniciar</button>
+        </div>
+
+        <div class="chips" id="statusChips">
+          <span class="chip">esperando datos…</span>
+        </div>
+
+        <div class="log" id="log" aria-label="registro"></div>
+
+        <h2 style="margin-top:14px">2) reglas aplicadas</h2>
+        <ul class="klist">
+          <li>solo contenido principal (se eliminan header/nav/footer/aside/widgets frecuentes)</li>
+          <li>imágenes: locales, <strong>.jpg</strong>, sin sufijos tipo <code>-1024x585</code></li>
+          <li>enlaces: locales, minúsculas, sin <code>_lumi</code></li>
+          <li>galería: <strong>4 imágenes por fila</strong></li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <div class="out-header">
+          <div>
+            <h3>vista previa del index.html generado</h3>
+            <p class="out-sub" id="outSub">sin generar aún</p>
+          </div>
+          <p class="out-sub" id="outCounts">—</p>
+        </div>
+
+        <div class="preview" role="region" aria-label="vista previa">
+          <div class="preview-inner" id="previewInner">
+            <p class="small">usa “cargar y analizar” y luego “generar vista previa”.</p>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:12px">
+          <h2>archivos que deben estar en la misma carpeta</h2>
+          <div class="small" id="assetHint">—</div>
+          <div class="log" id="assets"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+
+  const state = {
+    sourceUrl: "",
+    sourceHtml: "",
+    extractedTitle: "index",
+    cards: [],     // {href, img, title}
+    images: new Set(),
+    links: new Set(),
+    generatedHtml: ""
+  };
+
+  function log(msg){
+    const el = $("#log");
+    el.textContent += (el.textContent ? "\n" : "") + msg;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function setChips(list){
+    const wrap = $("#statusChips");
+    wrap.innerHTML = "";
+    list.forEach(x => {
+      const span = document.createElement("span");
+      span.className = "chip" + (x.type ? " " + x.type : "");
+      span.textContent = x.text;
+      wrap.appendChild(span);
+    });
+  }
+
+  function normalizeLower(s){ return (s || "").toString().trim().toLowerCase(); }
+
+  function basenameFromUrl(u){
+    try{
+      const url = new URL(u, location.href);
+      const path = url.pathname || "";
+      const base = path.split("/").filter(Boolean).pop() || "";
+      return base;
+    }catch{
+      // si ya es relativo o viene "raro"
+      const clean = (u || "").split("?")[0].split("#")[0];
+      const parts = clean.split("/").filter(Boolean);
+      return parts.pop() || "";
+    }
+  }
+
+  function stripSizeSuffix(filename){
+    // quita -1024x585 antes de la extensión
+    return filename.replace(/-\d+x\d+(?=\.[a-z0-9]+$)/i, "");
+  }
+
+  function toLocalJpg(filename){
+    let f = normalizeLower(filename);
+    f = f.split("?")[0].split("#")[0];
+    f = stripSizeSuffix(f);
+    // si termina en .webp => .jpg
+    f = f.replace(/\.webp$/i, ".jpg");
+    // si no tiene extensión de imagen, se deja
+    return f;
+  }
+
+  function toLocalHtml(filename){
+    let f = normalizeLower(filename);
+    f = f.split("?")[0].split("#")[0];
+    // elimina sufijo _lumi antes de .html
+    f = f.replace(/_lumi(?=\.html$)/i, "");
+    return f;
+  }
+
+  function pickImgSrc(img){
+    // prioriza lazy attrs y el mayor del srcset
+    const attrs = ["data-src", "data-lazy-src", "data-original", "data-large-file", "src"];
+    for(const a of attrs){
+      const v = img.getAttribute(a);
+      if(v) return v;
+    }
+    const srcset = img.getAttribute("srcset");
+    if(srcset){
+      // formato: url w, url w...
+      const items = srcset.split(",").map(x => x.trim()).filter(Boolean);
+      let best = "";
+      let bestW = -1;
+      for(const it of items){
+        const m = it.match(/^(.*)\s+(\d+)w$/);
+        if(m){
+          const url = m[1].trim();
+          const w = parseInt(m[2],10);
+          if(w > bestW){ bestW = w; best = url; }
+        }else{
+          // si no hay w, usar el primero
+          if(!best) best = it.split(/\s+/)[0];
+        }
+      }
+      if(best) return best;
+    }
+    return "";
+  }
+
+  function findContentRoot(doc){
+    const selectors = [
+      "article",
+      "main",
+      ".entry-content",
+      ".wp-block-post-content",
+      ".site-content",
+      "#content",
+      ".content-area"
+    ];
+    for(const sel of selectors){
+      const el = doc.querySelector(sel);
+      if(el && el.textContent.trim().length > 40) return el;
+    }
+    // fallback: body
+    return doc.body;
+  }
+
+  function pruneNoise(root){
+    const killSelectors = [
+      "header", "nav", "footer", "aside",
+      ".site-header", ".site-footer", "#masthead", "#colophon",
+      ".sidebar", ".widget", ".wp-block-navigation", ".wp-block-template-part",
+      ".menu", ".navigation", ".nav", ".footer", ".header",
+      "script", "style", "noscript",
+      ".comment", "#comments", ".comments-area"
+    ];
+    killSelectors.forEach(sel => root.querySelectorAll(sel).forEach(n => n.remove()));
+    // si queda un contenedor de layout, no se elimina: ya se podó dentro
+  }
+
+  function extractCardsFrom(root){
+    // tarjetas = enlaces que contienen imagen
+    const cards = [];
+    const seen = new Set();
+    root.querySelectorAll("a").forEach(a => {
+      const img = a.querySelector("img");
+      if(!img) return;
+      const hrefRaw = a.getAttribute("href") || "";
+      const imgSrcRaw = pickImgSrc(img);
+      if(!hrefRaw || !imgSrcRaw) return;
+
+      const hrefBase = toLocalHtml(basenameFromUrl(hrefRaw));
+      const imgBase = toLocalJpg(basenameFromUrl(imgSrcRaw));
+
+      // título: alt, texto del enlace o figcaption cercano
+      let title = (img.getAttribute("alt") || "").trim();
+      if(!title){
+        title = (a.textContent || "").trim().replace(/\s+/g," ");
+      }
+      if(!title){
+        const fig = a.closest("figure");
+        const cap = fig ? fig.querySelector("figcaption") : null;
+        title = cap ? (cap.textContent || "").trim() : "";
+      }
+      title = (title || hrefBase.replace(/\.html$/,"")).trim();
+
+      const key = hrefBase + "|" + imgBase;
+      if(seen.has(key)) return;
+      seen.add(key);
+
+      cards.push({
+        href: hrefBase,
+        img: imgBase,
+        title: normalizeLower(title)
+      });
+    });
+
+    // si no hay cards, intenta encontrar imágenes sueltas y convertirlas en cards sin enlace
+    if(cards.length === 0){
+      root.querySelectorAll("img").forEach(img => {
+        const imgSrcRaw = pickImgSrc(img);
+        if(!imgSrcRaw) return;
+        const imgBase = toLocalJpg(basenameFromUrl(imgSrcRaw));
+        let title = (img.getAttribute("alt") || "").trim();
+        title = normalizeLower(title || imgBase.replace(/\.[a-z0-9]+$/,""));
+        const key = "nolink|" + imgBase;
+        if(seen.has(key)) return;
+        seen.add(key);
+        cards.push({ href: "", img: imgBase, title });
+      });
+    }
+
+    return cards;
+  }
+
+  function collectAssets(cards){
+    state.images = new Set();
+    state.links = new Set();
+    cards.forEach(c => {
+      if(c.img) state.images.add(c.img);
+      if(c.href) state.links.add(c.href);
+    });
+  }
+
+  function renderAssets(){
+    const lines = [];
+    lines.push("imagenes (jpg):");
+    [...state.images].sort().forEach(f => lines.push(" - " + f));
+    lines.push("");
+    lines.push("archivos html enlazados:");
+    [...state.links].sort().forEach(f => lines.push(" - " + f));
+    $("#assets").textContent = lines.join("\n");
+    $("#assetHint").textContent = "coloca estos archivos en la misma carpeta que el index.html generado.";
+  }
+
+  function buildIndexHtml(){
+    // plantilla final (modo claro) + galería 4 por fila
+    const safeTitle = normalizeLower(state.extractedTitle || "index");
+    const cardsHtml = state.cards.map(c => {
+      const hrefAttr = c.href ? `href="${escapeHtmlAttr(c.href)}"` : `href="#" onclick="return false"`;
+      const badge = c.href ? escapeHtml(c.href) : "sin enlace";
+      const imgAlt = escapeHtmlAttr(c.title || "");
+      return `
+      <article class="card">
+        <a ${hrefAttr}>
+          <div class="thumb"><img src="${escapeHtmlAttr(c.img)}" alt="${imgAlt}"></div>
+          <div class="meta">
+            <p class="title">${escapeHtml(c.title || "")}</p>
+            <span class="badge">${badge}</span>
+          </div>
+        </a>
+      </article>`.trim();
+    }).join("\n");
+
+    // Nota: se respeta estructura general (título + contenido principal convertido a galería)
+    // porque la página origen, en la práctica, es un listado de entradas con imágenes.
+    const html = `<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>${escapeHtml(safeTitle)}</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --txt:#111827;
+      --muted:#6b7280;
+      --line:rgba(17,24,39,.12);
+      --shadow: 0 12px 30px rgba(17,24,39,.10);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(59,130,246,.10) 0%, rgba(59,130,246,0) 55%),
+        radial-gradient(1000px 700px at 85% 10%, rgba(168,85,247,.10) 0%, rgba(168,85,247,0) 55%),
+        var(--bg);
+      color:var(--txt);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 18px 46px}
+    header{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+      padding:18px 18px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.55));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    h1{margin:0;font-size: clamp(22px, 2.4vw, 34px);letter-spacing:.2px;text-transform:lowercase}
+    .hint{margin:0;color:var(--muted);font-size:14px}
+
+    /* galería fija: 4 por fila SIEMPRE */
+    .gallery{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:16px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      transform: translateZ(0);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      min-width:0;
+    }
+    .card:hover{
+      transform: translateY(-3px) scale(1.01);
+      border-color: rgba(59,130,246,.35);
+      box-shadow: 0 16px 38px rgba(17,24,39,.14);
+    }
+    .thumb{position:relative;width:100%;aspect-ratio:16/9;background: rgba(17,24,39,.04);overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .meta{padding:12px 12px 14px}
+    .title{margin:0;font-size:14px;line-height:1.2;color:var(--txt);text-transform:lowercase}
+    a{color:inherit;text-decoration:none}
+    .badge{
+      display:inline-block;margin-top:8px;padding:4px 8px;border-radius:999px;font-size:12px;
+      color:var(--muted);border:1px solid rgba(17,24,39,.12);background: rgba(17,24,39,.03);
+      word-break:break-word;
+    }
+
+    /* si la pantalla es estrecha, mantener 4 por fila con scroll horizontal */
+    @media (max-width: 520px){
+      .wrap{padding:18px 12px 34px}
+      .gallery{overflow-x:auto;padding-bottom:8px}
+      .card{min-width:220px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>${escapeHtml(safeTitle)}</h1>
+        <p class="hint">galería (4 por fila). imágenes y archivos enlazados deben estar en esta misma carpeta.</p>
+      </div>
+      <p class="hint">archivo: <strong>index.html</strong></p>
+    </header>
+
+    <section class="gallery" aria-label="galería">
+${cardsHtml}
+    </section>
+  </div>
+</body>
+</html>`;
+
+    return html;
+  }
+
+  function escapeHtml(s){
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+  function escapeHtmlAttr(s){ return escapeHtml(s).replaceAll("\n"," ").replaceAll("\r"," "); }
+
+  async function fetchHtml(url){
+    const proxy = $("#proxy").value.trim();
+    const finalUrl = proxy ? (proxy + url) : url;
+    const res = await fetch(finalUrl, { method:"GET" });
+    if(!res.ok) throw new Error("fetch no ok: " + res.status + " " + res.statusText);
+    return await res.text();
+  }
+
+  function parseAndExtract(htmlText){
+    const doc = new DOMParser().parseFromString(htmlText, "text/html");
+    const title = (doc.querySelector("h1")?.textContent || doc.title || "index").trim();
+    const root = findContentRoot(doc);
+    pruneNoise(root);
+
+    // reescritura básica in-situ (para extracción más fiable)
+    root.querySelectorAll("img").forEach(img => {
+      const srcRaw = pickImgSrc(img);
+      if(!srcRaw) return;
+      const imgBase = toLocalJpg(basenameFromUrl(srcRaw));
+      img.setAttribute("src", imgBase);
+      img.removeAttribute("srcset");
+      img.removeAttribute("sizes");
+      img.removeAttribute("data-src");
+      img.removeAttribute("data-lazy-src");
+    });
+
+    root.querySelectorAll("a[href]").forEach(a => {
+      const hrefRaw = a.getAttribute("href") || "";
+      if(!hrefRaw) return;
+      const base = basenameFromUrl(hrefRaw);
+      // solo transformamos si parece un html (típico en tu caso)
+      if(/\.html(\?.*)?$/i.test(hrefRaw) || /_lumi\.html(\?.*)?$/i.test(hrefRaw)){
+        a.setAttribute("href", toLocalHtml(base));
+      }
+    });
+
+    const cards = extractCardsFrom(root);
+
+    return { title, cards };
+  }
+
+  function updateCounts(){
+    $("#outCounts").textContent = `${state.cards.length} items · ${state.images.size} imágenes · ${state.links.size} enlaces`;
+  }
+
+  function renderPreview(){
+    const host = $("#previewInner");
+    host.innerHTML = "";
+
+    const title = document.createElement("h2");
+    title.style.margin = "0 0 6px 0";
+    title.style.fontSize = "18px";
+    title.style.textTransform = "lowercase";
+    title.textContent = normalizeLower(state.extractedTitle || "index");
+    host.appendChild(title);
+
+    const sub = document.createElement("p");
+    sub.className = "small";
+    sub.style.margin = "0";
+    sub.textContent = "vista previa (no descarga imágenes; deben estar en la misma carpeta).";
+    host.appendChild(sub);
+
+    const gallery = document.createElement("div");
+    gallery.className = "gallery";
+    state.cards.forEach(c => {
+      const card = document.createElement("article");
+      card.className = "card";
+      const a = document.createElement("a");
+      if(c.href){
+        a.href = c.href;
+      }else{
+        a.href = "#";
+        a.onclick = (e) => { e.preventDefault(); };
+      }
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+      const img = document.createElement("img");
+      img.src = c.img;
+      img.alt = c.title || "";
+      thumb.appendChild(img);
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const p = document.createElement("p");
+      p.className = "title";
+      p.textContent = c.title || "";
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = c.href || "sin enlace";
+      meta.appendChild(p);
+      meta.appendChild(badge);
+
+      a.appendChild(thumb);
+      a.appendChild(meta);
+      card.appendChild(a);
+      gallery.appendChild(card);
+    });
+    host.appendChild(gallery);
+  }
+
+  async function onLoad(){
+    $("#btnGenerate").disabled = true;
+    $("#btnDownload").disabled = true;
+    $("#previewInner").innerHTML = `<p class="small">cargando…</p>`;
+    $("#assets").textContent = "";
+    $("#assetHint").textContent = "—";
+
+    const url = $("#url").value.trim();
+    const pasted = $("#htmlpaste").value.trim();
+
+    state.sourceUrl = url;
+    state.sourceHtml = "";
+
+    setChips([{text:"procesando…"}]);
+    $("#log").textContent = "";
+
+    try{
+      let htmlText = "";
+      if(pasted){
+        log("usando html pegado.");
+        htmlText = pasted;
+      }else{
+        if(!url) throw new Error("faltan datos: introduce una url o pega el html.");
+        log("intentando fetch de: " + url);
+        htmlText = await fetchHtml(url);
+        log("html descargado: " + htmlText.length + " caracteres.");
+      }
+      state.sourceHtml = htmlText;
+
+      const { title, cards } = parseAndExtract(htmlText);
+      state.extractedTitle = normalizeLower(title || "index");
+      state.cards = cards;
+
+      collectAssets(cards);
+
+      const ok = cards.length > 0;
+      setChips([
+        {text: ok ? "contenido extraído" : "sin items detectados", type: ok ? "ok" : "bad"},
+        {text: `items: ${cards.length}`},
+        {text: `imágenes: ${state.images.size}`},
+        {text: `enlaces: ${state.links.size}`}
+      ]);
+
+      $("#outSub").textContent = ok ? "listo para generar index.html" : "no se detectaron tarjetas; revisa el html o la url.";
+      updateCounts();
+      renderAssets();
+
+      $("#btnGenerate").disabled = !ok;
+      $("#btnDownload").disabled = true;
+
+      if(ok){
+        $("#previewInner").innerHTML = `<p class="small">pulsa “generar vista previa”.</p>`;
+      }else{
+        $("#previewInner").innerHTML = `<p class="small">no se detectaron enlaces con imagen. prueba a pegar el html fuente o revisa la página origen.</p>`;
+      }
+    }catch(err){
+      setChips([{text:"error", type:"bad"}]);
+      $("#previewInner").innerHTML = `<p class="small" style="color:var(--bad)">error: ${escapeHtml(err.message || String(err))}</p>`;
+      log("error: " + (err.message || String(err)));
+      log("");
+      log("nota: si el fetch falla por cors, pega el html (ver código fuente) o usa un proxy cors.");
+    }
+  }
+
+  function onGenerate(){
+    try{
+      state.generatedHtml = buildIndexHtml();
+      renderPreview();
+      $("#outSub").textContent = "index.html generado (previsualización).";
+      $("#btnDownload").disabled = false;
+      setChips([
+        {text:"generado", type:"ok"},
+        {text:`items: ${state.cards.length}`},
+        {text:`imágenes: ${state.images.size}`},
+        {text:`enlaces: ${state.links.size}`}
+      ]);
+      log("index.html generado. tamaño: " + state.generatedHtml.length + " caracteres.");
+    }catch(err){
+      setChips([{text:"error al generar", type:"bad"}]);
+      log("error al generar: " + (err.message || String(err)));
+    }
+  }
+
+  function onDownload(){
+    const html = state.generatedHtml || "";
+    if(!html){
+      setChips([{text:"no hay html generado", type:"bad"}]);
+      return;
+    }
+    const blob = new Blob([html], {type:"text/html;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "index.html";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    log("descarga iniciada: index.html");
+  }
+
+  function onReset(){
+    $("#url").value = "";
+    $("#proxy").value = "";
+    $("#htmlpaste").value = "";
+    $("#log").textContent = "";
+    $("#assets").textContent = "";
+    $("#assetHint").textContent = "—";
+    $("#outSub").textContent = "sin generar aún";
+    $("#outCounts").textContent = "—";
+    $("#previewInner").innerHTML = `<p class="small">usa “cargar y analizar” y luego “generar vista previa”.</p>`;
+    $("#btnGenerate").disabled = true;
+    $("#btnDownload").disabled = true;
+    setChips([{text:"esperando datos…"}]);
+
+    state.sourceUrl = "";
+    state.sourceHtml = "";
+    state.extractedTitle = "index";
+    state.cards = [];
+    state.images = new Set();
+    state.links = new Set();
+    state.generatedHtml = "";
+  }
+
+  $("#btnLoad").addEventListener("click", onLoad);
+  $("#btnGenerate").addEventListener("click", onGenerate);
+  $("#btnDownload").addEventListener("click", onDownload);
+  $("#btnReset").addEventListener("click", onReset);
+
+  // estado inicial
+  onReset();
+})();
+</script>
+</body>
+</html>
