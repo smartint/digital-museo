@@ -271,18 +271,20 @@
       </article>
     </section>
   </div>
-<div style="font-family: Arial; font-size: 18px;">
-  👀 Visitas: <span id="contador">Cargando...</span>
+<div style="font-family:Arial; font-size:18px; background:#eef4ff; padding:10px; border-radius:10px; width:fit-content;">
+  👀 Visitas: <b id="contador-visitas">...</b>
 </div>
 
 <script>
-fetch('https://api.countapi.xyz/hit/smartint.github.io/digital-museo')
-  .then(response => response.json())
+const contadorID = "simon-martin-nuseo"; // cambia esto por un nombre único
+
+fetch("https://countapi.mileshilliard.com/hit/" + contadorID)
+  .then(r => r.json())
   .then(data => {
-    document.getElementById('contador').textContent = data.value;
+    document.getElementById("contador-visitas").textContent = data.value;
   })
   .catch(() => {
-    document.getElementById('contador').textContent = "Error";
+    document.getElementById("contador-visitas").textContent = "No disponible";
   });
 </script>
 </body>
