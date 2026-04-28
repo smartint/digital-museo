@@ -271,22 +271,11 @@
       </article>
     </section>
   </div>
-<div style="font-family:Arial; font-size:18px; background:#eef4ff; padding:10px; border-radius:10px; width:fit-content;">
-  👀 Visitas: <b id="contador-visitas">...</b>
+<div style="font-family:Arial; font-size:18px; margin:10px 0;">
+  <img 
+    src="https://hitscounter.dev/api/hit?url=https%3A%2F%2Fsmartint.github.io%2Fdigital-museo%2F&label=Visitas&icon=eye&color=%231e88e5&message=&style=flat&tz=Atlantic%2FCanary"
+    alt="Contador de visitas">
 </div>
-
-<script>
-const contadorID = "simon-martin-nuseo"; // cambia esto por un nombre único
-
-fetch("https://countapi.mileshilliard.com/hit/" + contadorID)
-  .then(r => r.json())
-  .then(data => {
-    document.getElementById("contador-visitas").textContent = data.value;
-  })
-  .catch(() => {
-    document.getElementById("contador-visitas").textContent = "No disponible";
-  });
-</script>
 </body>
 </html>
 </body>
