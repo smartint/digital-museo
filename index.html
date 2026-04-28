@@ -271,18 +271,18 @@
       </article>
     </section>
   </div>
-  <div style="font-family:Arial; padding:10px; border-radius:10px; background:#f3f6ff; display:inline-block;">
-  👀 Visitas: <span id="visitas">0</span>
+<div style="font-family: Arial; font-size: 18px;">
+  👀 Visitas: <span id="contador">Cargando...</span>
 </div>
 
 <script>
-fetch('https://api.countapi.xyz/hit/smartint.github.io/digital-museo/contador2')
-  .then(res => res.json())
+fetch('https://api.countapi.xyz/hit/smartint.github.io/digital-museo')
+  .then(response => response.json())
   .then(data => {
-    document.getElementById('visitas').textContent = data.value;
+    document.getElementById('contador').textContent = data.value;
   })
-  .catch(err => {
-    document.getElementById('visitas').textContent = "error";
+  .catch(() => {
+    document.getElementById('contador').textContent = "Error";
   });
 </script>
 </body>
