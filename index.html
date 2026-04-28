@@ -271,5 +271,21 @@
       </article>
     </section>
   </div>
+  <div style="font-family:Arial; padding:10px; border-radius:10px; background:#f3f6ff; display:inline-block;">
+  👀 Visitas: <span id="visitas">0</span>
+</div>
+
+<script>
+fetch('https://api.countapi.xyz/hit/smartint.github.io/digital-museo/contador2')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('visitas').textContent = data.value;
+  })
+  .catch(err => {
+    document.getElementById('visitas').textContent = "error";
+  });
+</script>
+</body>
+</html>
 </body>
 </html>
